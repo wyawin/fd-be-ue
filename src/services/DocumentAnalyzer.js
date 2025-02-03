@@ -11,6 +11,7 @@ export class DocumentAnalyzer {
 
   async analyzePDF(pdfBuffer) {
     try {
+      const copyPdf = new Uint8Array(pdfBuffer); 
       const fontMetrics = await this.extractFontMetrics(pdfBuffer);
       
       const inconsistencies = {
@@ -34,8 +35,8 @@ export class DocumentAnalyzer {
       const report = this.generateReport(inconsistencies);
       
       // Generate both highlighted PDFs
-      const highlightedPdf = await this.generateHighlightedPDF(pdfBuffer, fontMetrics, inconsistencies);
-      const fontTypePdf = await this.generateFontTypePDF(pdfBuffer, fontMetrics);
+      const highlightedPdf = await this.generateHighlightedPDF(copyPdf, fontMetrics, inconsistencies);
+      const fontTypePdf = await this.generateFontTypePDF(copyPdf, fontMetrics);
 
       return {
         ...report,

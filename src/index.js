@@ -2,6 +2,11 @@ import express from 'express';
 import multer from 'multer';
 import { DocumentAnalyzer } from './services/DocumentAnalyzer.js';
 import { logger } from './utils/logger.js';
+import fs from 'fs'
+import path from 'path'
+
+// Define input and output directories
+const OUTPUT_DIR = "./output";
 
 const app = express();
 const upload = multer({ limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit
@@ -19,6 +24,11 @@ app.post('/analyze', upload.single('pdf'), async (req, res) => {
 
     const pdfData = new Uint8Array(req.file.buffer);
     const result = await analyzer.analyzePDF(pdfData);
+
+    const outputFilePath = path.join(OUTPUT_DIR, 'pdfHighlighted.pdf'); // Use the same name for output
+    const outputFilePathFont = path.join(OUTPUT_DIR, 'pdfHighlightedFont.pdf'); // Use the same name for output
+    fs.writeFileSync(outputFilePath, result.highlightedPdf, "base64");
+    fs.writeFileSync(outputFilePathFont, result.fontTypePdf, "base64");
 
     res.setHeader('Content-Type', 'application/json');
     res.json({
